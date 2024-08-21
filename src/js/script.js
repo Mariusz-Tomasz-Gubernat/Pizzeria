@@ -3,9 +3,9 @@
 {
   'use strict';
 
-const select = {
-  templateOf: {
-    menuProduct: "#template-menu-product",
+  const select = {
+    templateOf: {
+      menuProduct: "#template-menu-product",
     },
     containerOf: {
       menu: '#product-list',
@@ -52,14 +52,64 @@ const select = {
     menuProduct: Handlebars.compile(document.querySelector(select.templateOf.menuProduct).innerHTML),
   };
 
+  class Product {
+    constructor(id, data) {
+      const thisProduct = this;
+      thisProduct.id = id;
+      thisProduct.data = data;
+
+      thisProduct.renderInMenu();
+      thisProduct.initAccordion();
+    };
+
+    renderInMenu() {
+      const thisProduct = this;
+      const generatedHTML = templates.menuProduct(thisProduct.data);
+      thisProduct.element = utils.createDOMFromHTML(generatedHTML);
+      const menuContainer = document.querySelector(select.containerOf.menu);
+      menuContainer.appendChild(thisProduct.element);
+    };
+
+    initAccordion() {
+      const thisProduct = this;
+      const clickableTrigger = thisProduct.element.querySelector(select.menuProduct.clickable);
+
+      clickableTrigger.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        const activeProducts = document.querySelectorAll(select.all.menuProductsActive);
+
+        for (let activeProduct of activeProducts) {
+
+          if (activeProduct != thisProduct.element) {
+            activeProduct.classList.remove(classNames.menuProduct.wrapperActive)
+          }
+        }
+
+        thisProduct.element.classList.toggle(classNames.menuProduct.wrapperActive)
+      });
+    }
+  }
+
   const app = {
-    init: function(){
+    initMenu: function () {
       const thisApp = this;
-      console.log('*** App starting ***');
-      console.log('thisApp:', thisApp);
-      console.log('classNames:', classNames);
-      console.log('settings:', settings);
-      console.log('templates:', templates);
+
+      for (let productData in thisApp.data.products) {
+        new Product(productData, thisApp.data.products[productData]);
+      }
+    },
+
+    initData: function () {
+      const thisApp = this;
+      thisApp.data = dataSource;
+    },
+
+    init: function () {
+      const thisApp = this;
+
+      thisApp.initData();
+      thisApp.initMenu();
     },
   };
 
