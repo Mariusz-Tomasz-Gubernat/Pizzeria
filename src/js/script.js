@@ -70,7 +70,7 @@
     amountWidget: {
       defaultValue: 1,
       defaultMin: 1,
-      defaultMax: 9,
+      defaultMax: 10,
     }, // CODE CHANGED
     // CODE ADDED START
     cart: {
@@ -165,6 +165,7 @@
       thisProduct.cartButton.addEventListener('click', function (event) {
         event.preventDefault();
         thisProduct.processOrder();
+        thisProduct.addToCart();
       })
     }
 
@@ -228,12 +229,13 @@
     setValue(value) {
       const thisWidget = this;
       const newValue = parseInt(value);
-      /* TO DO || ADD VALIDATION*/
       if (thisWidget.value !== newValue && !isNaN(newValue) && settings.amountWidget.defaultMin <= newValue && settings.amountWidget.defaultMax >= newValue) {
         thisWidget.value = newValue;
+      } else if (settings.amountWidget.defaultMax <= newValue) {
+        thisWidget.value = settings.amountWidget.defaultMax;
       } else {
         thisWidget.value = settings.amountWidget.defaultValue;
-      };
+      }
       thisWidget.input.value = thisWidget.value;
       thisWidget.announce();
     }
@@ -266,16 +268,13 @@
       thisCart.products = [];
       thisCart.getElements(element);
       thisCart.initActions();
-      console.log('New Cart', thisCart);
     }
 
     getElements(element) {
       const thisCart = this;
       thisCart.dom = {};
       thisCart.dom.wrapper = element;
-
       thisCart.dom.toggleTrigger = thisCart.dom.wrapper.querySelector(select.cart.toggleTrigger);
-      console.log(thisCart.dom.toggleTrigger);
     }
 
     initActions() {
